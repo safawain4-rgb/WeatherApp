@@ -1,0 +1,206 @@
+﻿<Window x:Class="weatherForecasting.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:weatherForecasting"
+        mc:Ignorable="d"
+        Title="Weather Forecast" Height="700" Width="420"
+        MinHeight="620" MinWidth="380"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource BackgroundBrush}"
+        FontFamily="Segoe UI"
+        TextElement.Foreground="{StaticResource PrimaryTextBrush}">
+
+    <Window.Resources>
+        <!-- Converts a boolean to Visibility for showing/hiding overlays -->
+    </Window.Resources>
+
+    <Grid Margin="22,22,22,18">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />   <!-- 0: title -->
+            <RowDefinition Height="Auto" />   <!-- 1: search bar -->
+            <RowDefinition Height="Auto" />   <!-- 2: error banner -->
+            <RowDefinition Height="*" />      <!-- 3: current weather hero -->
+            <RowDefinition Height="Auto" />   <!-- 4: forecast label -->
+            <RowDefinition Height="150" />    <!-- 5: forecast strip -->
+            <RowDefinition Height="Auto" />   <!-- 6: footer -->
+        </Grid.RowDefinitions>
+
+        <!-- ===================== Title ===================== -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="2,0,0,16">
+            <TextBlock Text="🌤" FontSize="22" Margin="0,0,8,0" VerticalAlignment="Center" />
+            <TextBlock Text="Weather Forecast" FontSize="20" FontWeight="SemiBold"
+                       Foreground="{StaticResource PrimaryTextBrush}" VerticalAlignment="Center" />
+        </StackPanel>
+
+        <!-- ===================== Search Bar ===================== -->
+        <Border Grid.Row="1" Background="{StaticResource CardBrush}" BorderBrush="{StaticResource CardBorderBrush}"
+                BorderThickness="1" CornerRadius="22" Padding="6,6,6,6" Margin="0,0,0,14">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" Text="📍" FontSize="15" VerticalAlignment="Center" Margin="10,0,6,0"
+                           Foreground="{StaticResource SecondaryTextBrush}" />
+
+                <Grid Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock x:Name="SearchPlaceholder" Text="Search for a city..."
+                               Foreground="{StaticResource MutedTextBrush}" FontSize="15"
+                               IsHitTestVisible="False" VerticalAlignment="Center" />
+                    <TextBox x:Name="CityTextBox" Style="{StaticResource SearchTextBoxStyle}"
+                             GotFocus="CityTextBox_GotFocus" LostFocus="CityTextBox_LostFocus"
+                             KeyDown="CityTextBox_KeyDown" TextChanged="CityTextBox_TextChanged" />
+                </Grid>
+
+                <Button Grid.Column="2" x:Name="SearchButton" Style="{StaticResource RoundIconButtonStyle}"
+                        Content="🔍" Click="SearchButton_Click" ToolTip="Search" />
+            </Grid>
+        </Border>
+
+        <!-- ===================== Error Banner ===================== -->
+        <Border Grid.Row="2" x:Name="ErrorBanner" Background="#3A1B26" BorderBrush="{StaticResource AccentBrush}"
+                BorderThickness="1" CornerRadius="10" Padding="12,8" Margin="0,0,0,12" Visibility="Collapsed">
+            <TextBlock x:Name="ErrorText" Foreground="#FFB4C2" FontSize="13" TextWrapping="Wrap" />
+        </Border>
+
+        <!-- ===================== Current Weather Hero ===================== -->
+        <Grid Grid.Row="3">
+
+            <!-- Idle state (first run, before any search) -->
+            <StackPanel x:Name="IdlePanel" VerticalAlignment="Center" HorizontalAlignment="Center" Opacity="0.85">
+                <TextBlock Text="🌍" FontSize="48" HorizontalAlignment="Center" Margin="0,0,0,10" />
+                <TextBlock Text="Search a city to see the forecast" Foreground="{StaticResource SecondaryTextBrush}"
+                           FontSize="14" HorizontalAlignment="Center" />
+            </StackPanel>
+
+            <!-- Loading state -->
+            <StackPanel x:Name="LoadingPanel" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="Collapsed">
+                <TextBlock Text="⏳" FontSize="40" HorizontalAlignment="Center" Margin="0,0,0,10" />
+                <TextBlock Text="Fetching weather..." Foreground="{StaticResource SecondaryTextBrush}" FontSize="14"
+                           HorizontalAlignment="Center" />
+            </StackPanel>
+
+            <!-- Loaded current-weather card -->
+            <Border x:Name="CurrentWeatherCard" Visibility="Collapsed"
+                    Background="{StaticResource AccentGradientBrush}" CornerRadius="24" Padding="24,26">
+                <Border.Effect>
+                    <DropShadowEffect Color="#000000" BlurRadius="24" ShadowDepth="6" Opacity="0.35" />
+                </Border.Effect>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Location + unit toggle -->
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock x:Name="CityNameText" Text="City" FontSize="20" FontWeight="SemiBold" Foreground="White" />
+                            <TextBlock x:Name="DateText" Text="Today" FontSize="12" Foreground="#FFE3E8" Opacity="0.85" Margin="0,2,0,0" />
+                        </StackPanel>
+                        <Border Grid.Column="1" Background="#33FFFFFF" CornerRadius="12" VerticalAlignment="Top">
+                            <StackPanel Orientation="Horizontal">
+                                <ToggleButton x:Name="CelsiusToggle" Style="{StaticResource UnitChipStyle}" Content="°C"
+                                              IsChecked="True" Checked="UnitToggle_Changed" />
+                                <ToggleButton x:Name="FahrenheitToggle" Style="{StaticResource UnitChipStyle}" Content="°F"
+                                              Checked="UnitToggle_Changed" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <!-- Big icon + temperature -->
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,18,0,0">
+                        <TextBlock x:Name="WeatherIconText" Text="☀️" FontSize="56" VerticalAlignment="Center" />
+                        <TextBlock x:Name="TemperatureText" Text="--°" FontSize="56" FontWeight="Light"
+                                   Foreground="White" Margin="10,0,0,0" VerticalAlignment="Center" />
+                    </StackPanel>
+
+                    <TextBlock Grid.Row="2" x:Name="ConditionText" Text="--" FontSize="16" Foreground="White"
+                               Margin="0,4,0,0" />
+
+                    <TextBlock Grid.Row="3" x:Name="FeelsLikeText" Text="" FontSize="12" Foreground="#FFE3E8"
+                               Opacity="0.85" Margin="0,2,0,0" />
+
+                    <!-- Spacer -->
+                    <Border Grid.Row="4" />
+
+                    <!-- Detail chips: humidity / wind -->
+                    <Grid Grid.Row="5" Margin="0,18,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0" Background="#26FFFFFF" CornerRadius="14" Padding="12,10" Margin="0,0,6,0">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="💧" FontSize="16" VerticalAlignment="Center" />
+                                <StackPanel Margin="8,0,0,0">
+                                    <TextBlock Text="Humidity" FontSize="10" Foreground="#FFE3E8" Opacity="0.85" />
+                                    <TextBlock x:Name="HumidityText" Text="--%" FontSize="14" FontWeight="SemiBold" Foreground="White" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Column="1" Background="#26FFFFFF" CornerRadius="14" Padding="12,10" Margin="6,0,0,0">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="💨" FontSize="16" VerticalAlignment="Center" />
+                                <StackPanel Margin="8,0,0,0">
+                                    <TextBlock Text="Wind" FontSize="10" Foreground="#FFE3E8" Opacity="0.85" />
+                                    <TextBlock x:Name="WindText" Text="-- km/h" FontSize="14" FontWeight="SemiBold" Foreground="White" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- ===================== Forecast Label ===================== -->
+        <TextBlock Grid.Row="4" x:Name="ForecastLabel" Text="5-Day Forecast" FontSize="14" FontWeight="SemiBold"
+                    Foreground="{StaticResource SecondaryTextBrush}" Margin="2,16,0,10" Visibility="Collapsed" />
+
+        <!-- ===================== Forecast Strip ===================== -->
+        <ScrollViewer Grid.Row="5" x:Name="ForecastScroll" HorizontalScrollBarVisibility="Auto"
+                      VerticalScrollBarVisibility="Disabled" Visibility="Collapsed">
+            <ItemsControl x:Name="ForecastItemsControl">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Style="{StaticResource ForecastCardStyle}">
+                            <StackPanel HorizontalAlignment="Center">
+                                <TextBlock Text="{Binding Day}" FontSize="12" FontWeight="SemiBold"
+                                           Foreground="{StaticResource SecondaryTextBrush}" HorizontalAlignment="Center" />
+                                <TextBlock Text="{Binding Icon}" FontSize="26" HorizontalAlignment="Center" Margin="0,8,0,8" />
+                                <TextBlock HorizontalAlignment="Center" FontSize="13">
+                                    <Run Text="{Binding TempMax}" FontWeight="SemiBold" Foreground="{StaticResource PrimaryTextBrush}" />
+                                    <Run Text=" / " Foreground="{StaticResource MutedTextBrush}" />
+                                    <Run Text="{Binding TempMin}" Foreground="{StaticResource SecondaryTextBrush}" />
+                                </TextBlock>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <!-- ===================== Footer ===================== -->
+        <TextBlock Grid.Row="6" Text="Data: Open-Meteo.com" FontSize="10"
+                   Foreground="{StaticResource MutedTextBrush}" HorizontalAlignment="Center" Margin="0,12,0,0" />
+    </Grid>
+</Window>

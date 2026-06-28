@@ -1,0 +1,123 @@
+﻿<Application x:Class="weatherForecasting.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:weatherForecasting"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+
+        <!-- ===================== Palette ===================== -->
+        <Color x:Key="BgTopColor">#1A1A2E</Color>
+        <Color x:Key="BgMidColor">#16213E</Color>
+        <Color x:Key="BgBottomColor">#0F3460</Color>
+        <Color x:Key="AccentColor">#E94560</Color>
+        <Color x:Key="AccentColorLight">#FF6B81</Color>
+
+        <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource AccentColor}" />
+        <SolidColorBrush x:Key="AccentLightBrush" Color="{StaticResource AccentColorLight}" />
+        <SolidColorBrush x:Key="CardBrush" Color="#1F2940" />
+        <SolidColorBrush x:Key="CardBorderBrush" Color="#2E3A5C" />
+        <SolidColorBrush x:Key="PrimaryTextBrush" Color="#F5F6FA" />
+        <SolidColorBrush x:Key="SecondaryTextBrush" Color="#9AA5C9" />
+        <SolidColorBrush x:Key="MutedTextBrush" Color="#6B7494" />
+
+        <LinearGradientBrush x:Key="BackgroundBrush" StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="{StaticResource BgTopColor}" Offset="0" />
+            <GradientStop Color="{StaticResource BgMidColor}" Offset="0.5" />
+            <GradientStop Color="{StaticResource BgBottomColor}" Offset="1" />
+        </LinearGradientBrush>
+
+        <LinearGradientBrush x:Key="AccentGradientBrush" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="{StaticResource AccentColor}" Offset="0" />
+            <GradientStop Color="#9B2C57" Offset="1" />
+        </LinearGradientBrush>
+
+        <!-- ===================== Search TextBox ===================== -->
+        <Style x:Key="SearchTextBoxStyle" TargetType="TextBox">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}" />
+            <Setter Property="CaretBrush" Value="{StaticResource PrimaryTextBrush}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="Padding" Value="4,0" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border Background="{TemplateBinding Background}">
+                            <ScrollViewer x:Name="PART_ContentHost" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ===================== Round Icon Button (search / refresh) ===================== -->
+        <Style x:Key="RoundIconButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource AccentBrush}" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Width" Value="38" />
+            <Setter Property="Height" Value="38" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd" Background="{TemplateBinding Background}" CornerRadius="19">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="{StaticResource AccentLightBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="bd" Property="Opacity" Value="0.8" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="bd" Property="Opacity" Value="0.5" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ===================== Chip Button (unit toggle C/F) ===================== -->
+        <Style x:Key="UnitChipStyle" TargetType="ToggleButton">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{StaticResource SecondaryTextBrush}" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Padding" Value="10,4" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border x:Name="bd" Background="{TemplateBinding Background}" CornerRadius="10" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="{StaticResource AccentBrush}" />
+                                <Setter Property="Foreground" Value="White" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ===================== Forecast day card ===================== -->
+        <Style x:Key="ForecastCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource CardBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource CardBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="16" />
+            <Setter Property="Padding" Value="14,16" />
+            <Setter Property="Margin" Value="0,0,10,0" />
+            <Setter Property="MinWidth" Value="84" />
+        </Style>
+
+    </Application.Resources>
+</Application>
