@@ -157,7 +157,7 @@ This project is licensed under the MIT License.
 
 **Safa Wain**
 
-Visual Communication Design Student | Developer | UI/UX Enthusiast
+Information Technology Student | Developer | UI/UX Enthusiast
 
 GitHub: https://github.com/SafaWain4-RGB
 
